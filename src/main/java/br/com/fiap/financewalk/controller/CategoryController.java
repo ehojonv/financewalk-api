@@ -1,6 +1,7 @@
 package br.com.fiap.financewalk.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
+@RequestMapping("categories")
 public class CategoryController {
 
     private List<Category> repo = List.of(
@@ -28,12 +32,12 @@ public class CategoryController {
             new Category(3L, "Educação", "Book")).stream()
             .collect(Collectors.toList());
 
-    @GetMapping("/categories")
+    @GetMapping
     public List<Category> index() {
         return repo;
     }
 
-    @PostMapping("/categories")
+    @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public Category create(@RequestBody Category category) {
         category.setId(new Random().nextLong());
@@ -42,21 +46,34 @@ public class CategoryController {
         return category;
     }
 
-    @GetMapping("/categories/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Category> get(@PathVariable Long id) {
         log.info("Buscando categoria pelo id: " + id);
 
-        return ResponseEntity.of(
-                repo.stream()
-                        .filter(c -> c.getId() == id)
-                        .findFirst());
+        return ResponseEntity.of(getCategoryById(id));
     }
 
-    @DeleteMapping("/categories/{id}")
+    private Optional<Category> getCategoryById(Long id) {
+        return repo.stream()
+                .filter(c -> c.getId() == id)
+                .findFirst();
+    }
+
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         log.info("Apagando categoria por id: {}", id);
-        repo.removeIf(c -> c.getId() == id);
+        repo.remove(getCategoryById(id).orElse(null));
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody Category updCategory) {
+        log.info("Atualizando categoria: {}, com id: {}", updCategory, id);
+        repo.remove(getCategoryById(id).orElseThrow());
+        updCategory.setId(id);
+        repo.add(updCategory);
+        return ResponseEntity.ok().build();
+
     }
 
 }
