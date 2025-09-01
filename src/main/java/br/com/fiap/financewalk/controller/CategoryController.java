@@ -1,13 +1,9 @@
 package br.com.fiap.financewalk.controller;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.financewalk.model.Category;
 import br.com.fiap.financewalk.repository.CategoryRepo;
@@ -39,36 +36,38 @@ public class CategoryController {
     @ResponseStatus(code = HttpStatus.CREATED)
     public Category create(@RequestBody Category category) {
         log.info("Criando categoria: " + category);
-        repo.save(category);
-        return category;
+        return repo.save(category);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Category> get(@PathVariable Long id) {
+    public Category get(@PathVariable Long id) {
         log.info("Buscando categoria pelo id: " + id);
-
-        return ResponseEntity.of(getCategoryById(id));
+        return getCategoryById(id);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
         log.info("Apagando categoria por id: {}", id);
-        repo.delete(getCategoryById(id).orElse(null));
-        return ResponseEntity.noContent().build();
+        repo.delete(getCategoryById(id));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody Category updCategory) {
+    public Category update(@PathVariable Long id, @RequestBody Category updCategory) {
         log.info("Atualizando categoria: {}, com id: {}", updCategory, id);
 
+        getCategoryById(id);
         updCategory.setId(id);
-        repo.save(updCategory);
-        return ResponseEntity.ok().build();
+        return repo.save(updCategory);
 
     }
 
-        private Optional<Category> getCategoryById(Long id) {
-        return repo.findById(id);
-    }
+    private Category getCategoryById(Long id) {
+        return repo
+                .findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Categoria não encontrada com id: " + id));
 
+    }
 }
