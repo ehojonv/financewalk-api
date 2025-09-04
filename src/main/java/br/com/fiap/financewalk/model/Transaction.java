@@ -23,16 +23,16 @@ public class Transaction {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank @Size(min = 3, max = 255)
+    @NotBlank(message = "{transaction.description.notblank}") 
+    @Size(min = 10, max = 255, message = "{transaction.description.size}")
     private String description;
 
-    @NotNull @Positive
+    @NotNull @Positive(message = "{transaction.amount.positive}")
     private BigDecimal amount;
 
-    @NotNull @PastOrPresent
+    @NotNull @PastOrPresent(message = "{transaction.date.pastorpresent}")
     private LocalDate date;
 
-    @NotBlank
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
