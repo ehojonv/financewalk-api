@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintValidatorContext;
 public class IconValidator implements ConstraintValidator<Icon, String>{
 
     private final List<String> validIcons = List.of(
+        "Banknote",
         "Dices",
         "Apple",
         "Bus",
@@ -17,7 +18,7 @@ public class IconValidator implements ConstraintValidator<Icon, String>{
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return validIcons.contains(value);
+        return value.isBlank() || validIcons.contains(value);
     }
 
     
