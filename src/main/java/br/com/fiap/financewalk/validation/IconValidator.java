@@ -13,7 +13,8 @@ public class IconValidator implements ConstraintValidator<Icon, String>{
         "Apple",
         "Bus",
         "Train",
-        "Book"
+        "Book",
+        "Movie"
     );
 
     @Override

@@ -13,18 +13,20 @@ public class CategoryService {
     @Autowired
     private CategoryRepo repo;
 
-    private ChatClient chat;
+    // private ChatClient chat;
 
     public CategoryService(ChatClient.Builder chatBuilder) {
-        this.chat = chatBuilder.build();
+        // this.chat = chatBuilder.build();
     }
 
     public Category save(Category category) {
         if (category.getIcon().isBlank()) {
-            String icon = chat
-                            .prompt("responda apenas diretamente, apenas a palavra sem pontuação. indique um ícone do Lucide.dev para a categoria " + category.getName())
-                            .call()
-                            .content();
+            // String icon = chat
+            //                 .prompt("responda apenas diretamente, apenas a palavra sem pontuação. indique um ícone do Lucide.dev para a categoria " + category.getName())
+            //                 .call()
+            //                 .content();
+
+            var icon = "Banknote";
             category.setIcon(icon);
         }
 
