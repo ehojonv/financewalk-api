@@ -5,23 +5,20 @@ import java.util.List;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class IconValidator implements ConstraintValidator<Icon, String>{
+public class IconValidator implements ConstraintValidator<Icon, String> {
 
     private final List<String> validIcons = List.of(
-        "Banknote",
         "Dices",
         "Apple",
         "Bus",
         "Train",
         "Book",
-        "Movie"
+        "Banknote"
     );
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return value.isBlank() || validIcons.contains(value);
+        return value.isBlank() || validIcons.contains(value) ;
     }
-
-    
 
 }

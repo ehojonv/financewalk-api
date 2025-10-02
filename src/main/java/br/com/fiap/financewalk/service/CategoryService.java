@@ -5,31 +5,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.fiap.financewalk.model.Category;
-import br.com.fiap.financewalk.repository.CategoryRepo;
+import br.com.fiap.financewalk.repository.CategoryRepository;
 
 @Service
 public class CategoryService {
-
+ 
     @Autowired
-    private CategoryRepo repo;
+    private CategoryRepository categoryRepository;
 
-    // private ChatClient chat;
+    private ChatClient chat;
 
-    public CategoryService(ChatClient.Builder chatBuilder) {
-        // this.chat = chatBuilder.build();
+    public CategoryService(ChatClient.Builder chatBuilder){
+        this.chat = chatBuilder.build();
     }
 
     public Category save(Category category) {
-        if (category.getIcon().isBlank()) {
-            // String icon = chat
-            //                 .prompt("responda apenas diretamente, apenas a palavra sem pontuação. indique um ícone do Lucide.dev para a categoria " + category.getName())
-            //                 .call()
-            //                 .content();
+        if(category.getIcon().isEmpty()){
+            String icon = chat
+                    .prompt("indique um ícone do Lucide.dev para a categoria " + category.getName() + ". Retorne apenas o nome do ícone com a primeira letra maiuscula.")
+                    .call()
+                    .content();
 
-            var icon = "Banknote";
             category.setIcon(icon);
         }
-
-        return repo.save(category);
+        return categoryRepository.save(category);
     }
+    
 }

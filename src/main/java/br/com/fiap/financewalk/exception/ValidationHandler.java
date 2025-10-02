@@ -13,18 +13,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ValidationHandler {
 
-    private record ValidationError(String field, String message) {
-        public ValidationError(FieldError fieldError) {
+    record ValidationErro(String field, String message){
+        public ValidationErro(FieldError fieldError){
             this(fieldError.getField(), fieldError.getDefaultMessage());
         }
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(BAD_REQUEST)
-    public List<ValidationError> handler(MethodArgumentNotValidException ex) {
+    public List<ValidationErro> handler(MethodArgumentNotValidException ex){
         return ex.getFieldErrors()
                 .stream()
-                .map(ValidationError::new)
+                .map(ValidationErro::new)
                 .toList();
     }
+    
 }

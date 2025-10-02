@@ -16,64 +16,62 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.financewalk.model.Category;
-import br.com.fiap.financewalk.repository.CategoryRepo;
+import br.com.fiap.financewalk.repository.CategoryRepository;
 import br.com.fiap.financewalk.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@Slf4j
 @RequestMapping("categories")
+@Slf4j
 public class CategoryController {
 
+    @Autowired // IoD
+    private CategoryRepository categoryRepository;
 
     @Autowired
-    private CategoryRepo repo;
-
-
-    @Autowired
-    private CategoryService service;
+    private CategoryService categoryService;
 
     @GetMapping
     public List<Category> index() {
-        return repo.findAll();
+        return categoryRepository.findAll();
     }
 
     @PostMapping
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public Category create(@RequestBody Category category) {
-        log.info("Criando categoria: " + category);
-        return service.save(category);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Category create(@RequestBody @Valid Category category) {
+        log.info("criando categoria " + category);
+        return categoryService.save(category);
     }
 
     @GetMapping("{id}")
     public Category get(@PathVariable Long id) {
-        log.info("Buscando categoria pelo id: " + id);
+        log.info("buscando categoria com id " + id);
         return getCategoryById(id);
     }
 
     @DeleteMapping("{id}")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        log.info("Apagando categoria por id: {}", id);
-        repo.delete(getCategoryById(id));
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void destroy(@PathVariable Long id) {
+        log.info("apagando categoria com id {}", id);
+        categoryRepository.delete(getCategoryById(id));
     }
 
     @PutMapping("{id}")
-    public Category update(@PathVariable Long id, @RequestBody Category updCategory) {
-        log.info("Atualizando categoria: {}, com id: {}", updCategory, id);
+    public Category update(@RequestBody @Valid Category categoryUpdated, @PathVariable Long id) {
+        log.info("atualizando categoria {} com id {}", categoryUpdated, id);
 
         getCategoryById(id);
-        updCategory.setId(id);
-        return repo.save(updCategory);
-
+        categoryUpdated.setId(id);
+        return categoryRepository.save(categoryUpdated);
     }
 
     private Category getCategoryById(Long id) {
-        return repo
-                .findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                "Categoria não encontrada com id: " + id));
-
+        return categoryRepository
+                    .findById(id)
+                    .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada com id " + id)
+                    );
     }
+
 }
